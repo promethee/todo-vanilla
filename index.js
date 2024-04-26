@@ -8,9 +8,14 @@ function getElements() {
     const taskTextEditBtn = document.getElementById("task-text-edit");
     const tasksContainerEl = document.getElementById("tasks-container");
 
+    const tasksFilterAllBtn = document.getElementById("tasks-filter-all");
+    const tasksFilterDoneBtn = document.getElementById("tasks-filter-done");
+    const tasksFilterTodoBtn = document.getElementById("tasks-filter-todo");
+
     return {
         h1El, h2El,
         taskTextClearBtn, taskTextInput, taskTextAddBtn, taskTextEditBtn,
+        tasksFilterAllBtn, tasksFilterDoneBtn, tasksFilterTodoBtn,
         tasksContainerEl
     };
 }
@@ -24,6 +29,17 @@ function updateTitles(tasksCount) {
         h1El.textContent = "no tasks";
     } else {
         h1El.textContent = `${tasksCount} task${tasksCount === 1 ? "" : "s"}`;
+    }
+}
+
+function cycleTasksFilter(viewMode) {
+    return function() {
+        Array.from(document.querySelectorAll("[task-done]")).forEach(element => element.classList.remove("hide"));
+        if (viewMode === "todo") {
+            Array.from(document.querySelectorAll("[task-done=false]")).forEach(element => element.classList.add("hide"));
+        } else if (viewMode === "done") {
+            Array.from(document.querySelectorAll("[task-done=true]")).forEach(element => element.classList.add("hide"));
+        }
     }
 }
 
@@ -45,6 +61,7 @@ function makeHtmlFromTask(tasksContainerEl, taskTextEditBtn) {
     return function(task) {
         const taskEl = document.createElement("div");
         taskEl.setAttribute("task-id", task.id);
+        taskEl.setAttribute("task-done", task.done);
         
         const taskDoneCheckBox = document.createElement("input");
         taskDoneCheckBox.setAttribute("type", "checkbox");
@@ -177,7 +194,9 @@ function deleteTask(ev) {
 }
 
 function reset() {
-    const { taskTextInput, taskTextAddBtn, taskTextEditBtn } = getElements();
+    const {
+        taskTextInput, taskTextAddBtn, taskTextEditBtn, tasksFilterToggleBtn, tasksFilterDescription
+    } = getElements();
 
     taskTextInput.value = "";
     taskTextAddBtn.classList.remove("hide");
@@ -189,7 +208,10 @@ function reset() {
 }
 
 function start() {
-    const { taskTextClearBtn, taskTextInput, taskTextAddBtn, taskTextEditBtn } = getElements();
+    const {
+        taskTextClearBtn, taskTextInput, taskTextAddBtn,
+        taskTextEditBtn, tasksFilterAllBtn, tasksFilterDoneBtn, tasksFilterTodoBtn
+    } = getElements();
 
     reset();
 
@@ -197,6 +219,9 @@ function start() {
     taskTextInput.addEventListener("keydown", validateTaskText);
     taskTextAddBtn.addEventListener("click", validateTaskText);
     taskTextEditBtn.addEventListener("click", updatedTaskText);
+    tasksFilterAllBtn.addEventListener("click", cycleTasksFilter("all"));
+    tasksFilterDoneBtn.addEventListener("click", cycleTasksFilter("done"));
+    tasksFilterTodoBtn.addEventListener("click", cycleTasksFilter("todo"));
 }
 
 document.addEventListener("DOMContentLoaded", start);
