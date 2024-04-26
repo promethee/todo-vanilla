@@ -12,9 +12,12 @@ function getElements() {
     const tasksFilterDoneBtn = document.getElementById("tasks-filter-done");
     const tasksFilterTodoBtn = document.getElementById("tasks-filter-todo");
 
+    const tasksExportBtn = document.getElementById("tasks-export");
+
     return {
         h1El, h2El,
         taskTextClearBtn, taskTextInput, taskTextAddBtn, taskTextEditBtn,
+        tasksExportBtn,
         tasksFilterAllBtn, tasksFilterDoneBtn, tasksFilterTodoBtn,
         tasksContainerEl
     };
@@ -193,6 +196,22 @@ function deleteTask(ev) {
     saveTasks(updatedTasks, tasksContainerEl);
 }
 
+function exportJSON() {
+    const tasks = loadTasks()
+    const blob = new Blob([JSON.stringify(tasks, "\n", 2)], { type: "application/json" });
+    const fileURL = URL.createObjectURL(blob);
+
+    const linkEl = document.createElement("a");
+    console.info(linkEl)
+    linkEl.setAttribute("href", fileURL);
+
+    const now = new Date();
+    const filename = `tasks_${(new Date).toISOString()}.json`
+    linkEl.setAttribute("download", filename);
+
+    linkEl.click();
+}
+
 function reset() {
     const {
         taskTextInput, taskTextAddBtn, taskTextEditBtn, tasksFilterToggleBtn, tasksFilterDescription
@@ -209,7 +228,7 @@ function reset() {
 
 function start() {
     const {
-        taskTextClearBtn, taskTextInput, taskTextAddBtn,
+        taskTextClearBtn, taskTextInput, taskTextAddBtn, tasksExportBtn,
         taskTextEditBtn, tasksFilterAllBtn, tasksFilterDoneBtn, tasksFilterTodoBtn
     } = getElements();
 
@@ -219,6 +238,7 @@ function start() {
     taskTextInput.addEventListener("keydown", validateTaskText);
     taskTextAddBtn.addEventListener("click", validateTaskText);
     taskTextEditBtn.addEventListener("click", updatedTaskText);
+    tasksExportBtn.addEventListener("click", exportJSON);
     tasksFilterAllBtn.addEventListener("click", cycleTasksFilter("all"));
     tasksFilterDoneBtn.addEventListener("click", cycleTasksFilter("done"));
     tasksFilterTodoBtn.addEventListener("click", cycleTasksFilter("todo"));
