@@ -1,4 +1,5 @@
 function getElements() {
+    const themeBtn = document.querySelector("#theme-switcher");
     const appEl = document.querySelector("#app");
     const h1El = document.querySelector("#title-container h1");
     const h2El = document.querySelector("#title-container h2");
@@ -16,6 +17,7 @@ function getElements() {
     const tasksExportBtn = document.getElementById("tasks-export");
 
     return {
+        themeBtn,
         appEl,
         h1El, h2El,
         taskTextClearBtn, taskTextInput, taskTextAddBtn, taskTextEditBtn,
@@ -35,6 +37,23 @@ function updateTitles(tasksCount) {
     } else {
         h1El.textContent = `${tasksCount} task${tasksCount === 1 ? "" : "s"}`;
     }
+}
+
+function switchTheme() {
+    const theme = localStorage.getItem("theme");
+
+    if (theme == null) {
+        localStorage.setItem("theme", "light");
+        switchTheme();
+    }
+
+    localStorage.setItem("theme", theme === "light" ? "dark": "light");
+
+    document.body.classList.remove("light");
+    document.body.classList.remove("dark");
+    document.body.classList.add(theme === "light" ? "dark" : "light");
+    const { themeBtn } = getElements();
+    themeBtn.textContent = `${theme === "light" ? "dark" : "light"} theme`;
 }
 
 function cycleTasksFilter(viewMode) {
@@ -257,7 +276,7 @@ function importJSON(ev) {
 }
 
 function reset() {
-    const { taskTextInput, taskTextAddBtn, taskTextEditBtn } = getElements();
+    const { appEl, taskTextInput, taskTextAddBtn, taskTextEditBtn } = getElements();
 
     taskTextInput.value = "";
     taskTextAddBtn.classList.remove("hide");
@@ -266,16 +285,22 @@ function reset() {
     const loadedTasks = loadTasks();
     updateTitles(loadedTasks.length);
     updateTasksList(loadedTasks);
+
+    const theme = localStorage.getItem("theme");
+    document.body.classList.add(theme);
 }
 
 function start() {
     const {
+        themeBtn,
         appEl,
         taskTextClearBtn, taskTextInput, taskTextAddBtn, tasksExportBtn,
         taskTextEditBtn, tasksFilterAllBtn, tasksFilterDoneBtn, tasksFilterTodoBtn
     } = getElements();
 
     reset();
+
+    themeBtn.addEventListener("click", switchTheme);
 
     taskTextClearBtn.addEventListener("click", clearTaskTextInput);
     taskTextInput.addEventListener("keydown", validateTaskText);
