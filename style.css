@@ -1,0 +1,15 @@
+.todo {
+    cursor: pointer;    
+}
+
+.done {
+    text-decoration: line-through;
+}
+
+.hide {
+    display: none;
+}
+
+.edit {
+    opacity: 0.5;
+}
