@@ -12,8 +12,31 @@ function loadTasks() {
     if (localStorage.getItem("tasks") == null) {
         localStorage.setItem("tasks", "[]");
     }
-    const initialTasks = JSON.parse(localStorage.getItem("tasks"));
-    return initialTasks;
+    const tasks = JSON.parse(localStorage.getItem("tasks"));
+    return tasks;
+}
+
+function saveTasks(tasks) {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+function clearTaskTextInput(inputEl) {
+    return function() {
+        inputEl.value = "";
+    }
+}
+
+function addTask(inputEl) {
+    return function(ev) {
+        const text = inputEl.value;
+        if (text.length === 0 || ev.key !== "Enter") {
+            return;
+        }
+        const task = { id: Date.now(), text, done: false };
+        const updatedTasks = loadTasks().concat(task);
+        saveTasks(updatedTasks);
+        clearTaskTextInput(inputEl)();
+    }
 }
 
 function start() {
@@ -21,10 +44,16 @@ function start() {
     const titleH1El = appEl.querySelector("h1");
     const titleH2El = appEl.querySelector("h2");
 
+    const taskTextClearBtn = document.getElementById("task-text-clear");
+    const taskTextInput = document.getElementById("task-text-input");
+    const taskTextAddBtn = document.getElementById("task-text-add");
+
     const loadedTasks = loadTasks();
     updateTitles(loadedTasks.length, titleH1El, titleH2El);
 
-    console.info({loadedTasks});
+    taskTextClearBtn.addEventListener("click", clearTaskTextInput(taskTextInput));
+    taskTextInput.addEventListener("keydown", addTask(taskTextInput));
+    taskTextAddBtn.addEventListener("click", addTask(taskTextInput));
 }
 
 document.addEventListener("DOMContentLoaded", start);
