@@ -13,3 +13,11 @@
 .edit {
     opacity: 0.5;
 }
+
+#app {
+    border: 8px solid white;
+}
+
+#app.import {
+    border: 8px dashed black;
+}

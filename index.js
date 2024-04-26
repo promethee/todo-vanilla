@@ -1,4 +1,5 @@
 function getElements() {
+    const appEl = document.querySelector("#app");
     const h1El = document.querySelector("#title-container h1");
     const h2El = document.querySelector("#title-container h2");
 
@@ -15,6 +16,7 @@ function getElements() {
     const tasksExportBtn = document.getElementById("tasks-export");
 
     return {
+        appEl,
         h1El, h2El,
         taskTextClearBtn, taskTextInput, taskTextAddBtn, taskTextEditBtn,
         tasksExportBtn,
@@ -148,7 +150,7 @@ function editTask(task) {
 }
 function updatedTaskText(ev) {
     const { taskTextInput } = getElements();
-    const id = +ev.target.getAttribute("task-id");
+    const id = ev.target.getAttribute("task-id");
     const text = taskTextInput.value;
     const updatedTask = { ...getTask(id), text };
     const previousTasks = loadTasks();
@@ -160,17 +162,16 @@ function updatedTaskText(ev) {
 }
 
 function validateTaskText(ev) {
-    console.info("validateTaskText", { ev });
     const { taskTextInput } = getElements();
     const text = taskTextInput.value;
     if (text.length === 0 || (ev.type === "keydown" && ev.key !== "Enter")) {
         return;
     }
-    const id = +ev.target.getAttribute("task-id");
+    const id = ev.target.getAttribute("task-id");
     if (id) {
         updateTask({ text })(ev);
     } else {
-        const task = { id: Date.now(), text, done: false };
+        const task = { id: Date.now().toString(16), text, done: false };
         const updatedTasks = loadTasks().concat(task);
         saveTasks(updatedTasks);
     }
@@ -178,7 +179,7 @@ function validateTaskText(ev) {
 
 function updateTask(updatedTask) {
     return function(ev) {
-        const id = +ev.target.getAttribute("task-id");
+        const id = ev.target.getAttribute("task-id");
         const previousTasks = loadTasks();
         const updatedTasks = previousTasks.map((task) => ({
             ...task,
@@ -190,32 +191,73 @@ function updateTask(updatedTask) {
 
 function deleteTask(ev) {
     const { tasksContainerEl } = getElements();
-    const id = +ev.target.getAttribute("task-id");
+    const id = ev.target.getAttribute("task-id");
     const previousTasks = loadTasks();
     const updatedTasks = previousTasks.filter((task) => task.id !== id);
-    saveTasks(updatedTasks, tasksContainerEl);
+    saveTasks(updatedTasks);
 }
 
 function exportJSON() {
-    const tasks = loadTasks()
+    const tasks = loadTasks();
     const blob = new Blob([JSON.stringify(tasks, "\n", 2)], { type: "application/json" });
     const fileURL = URL.createObjectURL(blob);
 
     const linkEl = document.createElement("a");
-    console.info(linkEl)
     linkEl.setAttribute("href", fileURL);
 
-    const now = new Date();
-    const filename = `tasks_${(new Date).toISOString()}.json`
+    const filename = `tasks_${(new Date).toISOString()}.json`;
     linkEl.setAttribute("download", filename);
 
     linkEl.click();
 }
 
+function filterForJSON(item) {
+    return item.type === "application/json";
+}
+
+function filterImportedTask(previousIds) {
+    return function (task) {
+        const vars = ["id", "text", "done"];
+        if (vars.some(_var => task[_var] === undefined || task[_var] === null)) {
+            return false;
+        }
+        if (task.id.length === 0 || task.textlength === 0 || typeof task.done !== "boolean") {
+            return false;
+        }
+        if (previousIds.some(id => id == task.id)) {
+            return false
+        }
+        return true;
+    }
+}
+
+function importJSON(ev) {
+    ev.preventDefault();
+    const fileItems = [...ev.dataTransfer.items].filter(item => item.kind === "file");
+    const { appEl } = getElements();
+    appEl.classList.remove("import");
+    
+    if (fileItems.length === 0) {
+        return    
+    }
+
+    const jsonFiles = fileItems.filter(filterForJSON).map(item => item.getAsFile());
+    jsonFiles.forEach(jsonFile => {
+        const fileReader = new FileReader();
+        fileReader.onload = function() {
+            const jsonData = JSON.parse(fileReader.result);
+            const previousTasks = loadTasks();
+            const previousIds = previousTasks.map((task => task.id));
+            const importedTasks = jsonData.filter(filterImportedTask(previousIds));
+            const updatedTasks = previousTasks.concat(importedTasks)
+            saveTasks(updatedTasks);
+        }
+        fileReader.readAsText(jsonFile);
+    });
+}
+
 function reset() {
-    const {
-        taskTextInput, taskTextAddBtn, taskTextEditBtn, tasksFilterToggleBtn, tasksFilterDescription
-    } = getElements();
+    const { taskTextInput, taskTextAddBtn, taskTextEditBtn } = getElements();
 
     taskTextInput.value = "";
     taskTextAddBtn.classList.remove("hide");
@@ -228,6 +270,7 @@ function reset() {
 
 function start() {
     const {
+        appEl,
         taskTextClearBtn, taskTextInput, taskTextAddBtn, tasksExportBtn,
         taskTextEditBtn, tasksFilterAllBtn, tasksFilterDoneBtn, tasksFilterTodoBtn
     } = getElements();
@@ -242,6 +285,15 @@ function start() {
     tasksFilterAllBtn.addEventListener("click", cycleTasksFilter("all"));
     tasksFilterDoneBtn.addEventListener("click", cycleTasksFilter("done"));
     tasksFilterTodoBtn.addEventListener("click", cycleTasksFilter("todo"));
+
+    window.addEventListener("dragover", function(ev) {
+        ev.preventDefault();
+        appEl.classList.add("import");
+    });
+    window.addEventListener("dragleave", function(ev) {
+        appEl.classList.remove("import");
+    });
+    appEl.addEventListener("drop", importJSON);
 }
 
 document.addEventListener("DOMContentLoaded", start);
