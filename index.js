@@ -53,7 +53,7 @@ function switchTheme() {
     document.body.classList.remove("dark");
     document.body.classList.add(theme === "light" ? "dark" : "light");
     const { themeBtn } = getElements();
-    themeBtn.textContent = `${theme === "light" ? "dark" : "light"} theme`;
+    themeBtn.textContent = `${theme === "light" ? "light" : "dark"} theme`;
 }
 
 function cycleTasksFilter(viewMode) {
@@ -84,6 +84,9 @@ function disableTasks() {
 function makeHtmlFromTask(tasksContainerEl, taskTextEditBtn) {
     return function(task) {
         const taskEl = document.createElement("div");
+        taskEl.classList.add("flex");
+        taskEl.classList.add("flex-row");
+        taskEl.classList.add("task-line");
         taskEl.setAttribute("task-id", task.id);
         taskEl.setAttribute("task-done", task.done);
         
@@ -276,7 +279,7 @@ function importJSON(ev) {
 }
 
 function reset() {
-    const { appEl, taskTextInput, taskTextAddBtn, taskTextEditBtn } = getElements();
+    const { themeBtn, taskTextInput, taskTextAddBtn, taskTextEditBtn } = getElements();
 
     taskTextInput.value = "";
     taskTextAddBtn.classList.remove("hide");
@@ -286,8 +289,12 @@ function reset() {
     updateTitles(loadedTasks.length);
     updateTasksList(loadedTasks);
 
-    const theme = localStorage.getItem("theme");
+    const theme = localStorage.getItem("theme") ?? "light";
+    localStorage.setItem("theme", theme);
+    document.body.classList.remove("light");
+    document.body.classList.remove("dark");
     document.body.classList.add(theme);
+    themeBtn.textContent = `${theme === "light" ? "light" : "dark"} theme`;
 }
 
 function start() {

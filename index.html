@@ -7,28 +7,34 @@
 </head>
 <body>
     <script src="index.js"></script>
-    <div id="app">
-        <div id="theme-line">
-            <button id="theme-switcher">dark theme</button>
+    <div id="app" class="flex flex-row w99">
+        <div class="flex flex-col w99">
+            <div id="theme-line" class="flex flex-row w99">
+                <button id="theme-switcher">light theme</button>
+            </div>
+            <div class="flex flex-row" id="main-container">
+                <div class="flex flex-col">
+                    <div id="title-container">
+                        <h1></h1>
+                        <h2></h2>
+                    </div>
+                    <div id="task-tool" class="flex">
+                        <button id="task-text-clear">x</button>
+                        <input id="task-text-input" type="text" />
+                        <button id="task-text-add">+</button>
+                        <button id="task-text-edit">&check;</button>
+                        <span>&nbsp;</span>
+                        <button id="tasks-export">&ShortDownArrow; export</button>
+                    </div>
+                    <div id="tasks-filter-line" class="flex flex-row">
+                        <button id="tasks-filter-all">all</button>
+                        <button id="tasks-filter-done">done</button>
+                        <button id="tasks-filter-todo">todo</button>
+                    </div>
+                    <div id="tasks-container" class="flex flex-col"></div>
+                </div>
+            </div>
         </div>
-        <div id="title-container">
-            <h1></h1>
-            <h2></h2>
-        </div>
-        <div id="task-tool">
-            <button id="task-text-clear">x</button>
-            <input id="task-text-input" type="text" />
-            <button id="task-text-add">+</button>
-            <button id="task-text-edit">&check;</button>
-            <span>&nbsp;</span>
-            <button id="tasks-export">&ShortDownArrow; export</button>
-        </div>
-        <div id="tasks-filter-line">
-            <button id="tasks-filter-all">all</button>
-            <button id="tasks-filter-done">done</button>
-            <button id="tasks-filter-todo">todo</button>
-        </div>
-        <div id="tasks-container"></div>
     </div>
 </body>
 </html>

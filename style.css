@@ -3,13 +3,14 @@
     padding: 0;
 }
 
+body {
+    overflow-x: hidden;
+}
+
 .todo {
     cursor: pointer;    
 }
 
-.done {
-    text-decoration: line-through;
-}
 
 .hide {
     display: none;
@@ -17,6 +18,58 @@
 
 .edit {
     opacity: 0.5;
+}
+
+.flex {
+    display: flex;
+}
+.flex-row {
+    flex-direction: row;
+}
+.flex-col {
+    flex-direction: column;
+}
+.w99 {
+    width: 99%;
+}
+div {
+    margin-bottom: 8px;
+}
+
+#theme-line {
+ justify-content: end;
+}
+
+#main-container {
+    justify-content: center;
+}
+
+#main-container>div {
+    max-width: 50%;
+}
+
+#title-container {
+    text-align: center;
+}
+
+#task-tool {
+    justify-content: center;
+}
+
+#tasks-filter-line {
+    justify-content: space-around;
+}
+
+.task-line {
+    justify-content: space-between;
+}
+
+.task-line span {
+    margin-left: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
 }
 
 #app {
@@ -29,13 +82,13 @@
 }
 
 .light {
-    background-color: #222;
-    color: white
+    background-color: white;
+    color: #222;
 }
 
 .dark {
-    background-color: white;
-    color: #222;
+    background-color: #222;
+    color: white;
 }
 
 .light #app.import {
@@ -51,13 +104,25 @@ button {
 }
 
 .light button {
+    background-color: #fff;
+    border-color: #fff;
+    color: #222;
+}
+
+.dark button {
     background-color: #222;
     color: #fff;
     border-color: #000;
 }
 
-.dark button {
-    background-color: #fff;
-    border-color: #fff;
-    color: #222;
+.done {
+    text-decoration: line-through;
+}
+
+.light .done {
+    text-decoration-color: #222;
+}
+
+.dark .done {
+    text-decoration-color: #fff;
 }
