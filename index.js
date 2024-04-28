@@ -37,6 +37,7 @@ function updateTitles(tasksCount) {
     } else {
         h1El.textContent = `${tasksCount} task${tasksCount === 1 ? "" : "s"}`;
     }
+    document.title = h1El.textContent;
 }
 
 function switchTheme() {
